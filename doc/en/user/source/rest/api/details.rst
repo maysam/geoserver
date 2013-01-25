@@ -8,12 +8,12 @@ This page contains information on the REST API architecture.
 Authentication
 --------------
 
-Requests that modify resources (POST, PUT, and DELETE operations) require the client to be authenticated. By default, method of authentication used is Basic authentication. See the :ref:`security` section for how to change the authentication method.
+Requests that modify resources (POST, PUT, and DELETE operations) require the client to be authenticated. By default, the method of authentication used is Basic authentication. See the :ref:`security` section for how to change the authentication method.
 
 Status codes
 ------------
 
-An HTTP request uses a status code to relay the outcome of the request to the client. Different status codes are used for various purposes through out this document. These codes are described in detail by the `HTTP specification <http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html>`_.
+An HTTP request uses a status code to relay the outcome of the request to the client. Different status codes are used for various purposes throughout this document. These codes are described in detail by the `HTTP specification <http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html>`_.
 
 The most common status codes are listed below, along with their descriptions:
 
