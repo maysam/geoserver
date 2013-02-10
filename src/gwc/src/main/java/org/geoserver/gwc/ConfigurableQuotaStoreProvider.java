@@ -19,6 +19,9 @@ import org.geowebcache.diskquota.QuotaStore;
 import org.geowebcache.diskquota.QuotaStoreProvider;
 import org.geowebcache.diskquota.jdbc.JDBCQuotaStoreFactory;
 import org.geowebcache.diskquota.storage.TilePageCalculator;
+import org.geowebcache.layer.TileLayer;
+
+import sun.reflect.generics.scope.DummyScope;
 
 /**
  * A quota store whose store is a {@link ConfigurableQuotaStore} whose delegate can be reloaded by
@@ -57,28 +60,53 @@ public class ConfigurableQuotaStoreProvider extends QuotaStoreProvider {
         
         // get the quota store name
         DiskQuotaConfig config = loader.loadConfig();
-        String quotaStoreName = config.getQuotaStore();
-        // in case it's null GeoServer defaults to H2 store, we don't have the
-        // BDB store in the classpath
-        if(quotaStoreName == null) {
-            quotaStoreName = JDBCQuotaStoreFactory.H2_STORE;
-        }
-
         QuotaStore store  = null;
-        try {
-            store = getQuotaStoreByName(quotaStoreName);
-            exception = null;
-        } catch(Exception e) {
-            LOGGER.log(Level.SEVERE, "Failed to get a quota store, " +
-            		"the GeoWebCache disk quota subsystem will stop working now", e);
-            this.exception = e;
+        if(!config.isEnabled()) {
+            // it would be nice to just return null, but the other portions of the 
+            // disk quota system will throw exceptions if we did while the quota store
+            // is not disable via system variable. Let's just give it a dummy quota store instead.
             store = new DummyQuotaStore(calculator);
+        } else {
+            String quotaStoreName = config.getQuotaStore();
+            // in case it's null GeoServer defaults to H2 store, we don't have the
+            // BDB store in the classpath
+            if(quotaStoreName == null) {
+                quotaStoreName = JDBCQuotaStoreFactory.H2_STORE;
+            }
+            
+            try {
+                store = getQuotaStoreByName(quotaStoreName);
+                exception = null;
+            } catch(Exception e) {
+                LOGGER.log(Level.SEVERE, "Failed to get a quota store, " +
+                		"the GeoWebCache disk quota subsystem will stop working now", e);
+                this.exception = e;
+                store = new DummyQuotaStore(calculator);
+            }
         }
         
         if (this.store == null) {
             this.store = new ConfigurableQuotaStore(store);
         } else {
-            ((ConfigurableQuotaStore) this.store).setStore(store);
+            ConfigurableQuotaStore configurable = (ConfigurableQuotaStore) this.store;
+            QuotaStore oldStore = configurable.getStore();
+            configurable.setStore(store);
+            // clean up the quota information gathered so far, otherwise when re-enabling
+            // we'll have in the db stale information
+            if(!(oldStore instanceof DummyQuotaStore)) {
+                try {
+                    for (TileLayer tl : GWC.get().getTileLayers()) {
+                        oldStore.deleteLayer(tl.getName());
+                    }
+                } finally {
+                    try {
+                        oldStore.close();
+                    } catch (Exception e) {
+                        LOGGER.log(Level.SEVERE,
+                                "An error occurred while closing up the previous quota store", e);
+                    }
+                }
+            }
         }
 
     }
