@@ -6,6 +6,7 @@ package org.geoserver.kml;
 
 import java.io.IOException;
 
+import org.geoserver.kml.builder.StreamingKMLBuilder;
 import org.geoserver.platform.ServiceException;
 import org.geoserver.wms.MapProducerCapabilities;
 import org.geoserver.wms.WMS;
@@ -35,12 +36,12 @@ public class KMZMapOutputFormat extends AbstractMapOutputFormat {
     
     public static final String NL_KMZ_MIME_TYPE = KMZMapOutputFormat.MIME_TYPE + ";mode=networklink";
 
-    public static final String[] OUTPUT_FORMATS = { MIME_TYPE, NL_KMZ_MIME_TYPE,
+    public static final String[] OUTPUT_FORMATS = { MIME_TYPE, /* NL_KMZ_MIME_TYPE , */
             "application/vnd.google-earth.kmz+xml", "kmz", "application/vnd.google-earth.kmz xml" };
 
     private WMS wms;
 
-    private KMLBuilder builder = new KMLBuilder();
+    private StreamingKMLBuilder builder = new StreamingKMLBuilder();
 
     public KMZMapOutputFormat(WMS wms) {
         super(MIME_TYPE, OUTPUT_FORMATS);

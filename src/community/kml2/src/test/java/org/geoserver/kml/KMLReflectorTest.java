@@ -44,8 +44,6 @@ import org.geoserver.ows.util.KvpUtils;
 import org.geoserver.wms.WMSTestSupport;
 import org.junit.Test;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 
 import com.mockrunner.mock.web.MockHttpServletResponse;
 
@@ -146,7 +144,7 @@ public class KMLReflectorTest extends WMSTestSupport {
         Document dom = getAsDOM(requestUrl);
         print(dom);
         assertEquals("kml", dom.getDocumentElement().getLocalName());
-        assertXpathExists("kml:kml/kml:Document/kml:NetworkLink/kml:Url/kml:href", dom);
+        assertXpathExists("kml:kml/kml:Document/kml:Folder/kml:NetworkLink/kml:Link/kml:href", dom);
         assertXpathExists("kml:kml/kml:Document/kml:LookAt/kml:longitude", dom);
     }
 
@@ -208,7 +206,7 @@ public class KMLReflectorTest extends WMSTestSupport {
 
         print(dom);
         // all the kvp parameters (which should be set as format_options now are correctly parsed)
-        String result = xpath.evaluate("//kml:NetworkLink/kml:Url/kml:href", dom);
+        String result = xpath.evaluate("//kml:NetworkLink/kml:Link/kml:href", dom);
         Map<String, Object> kvp = KvpUtils.parseQueryString(result);
         String formatOptions = (String) kvp.get("format_options");
         assertEquals(
@@ -223,9 +221,9 @@ public class KMLReflectorTest extends WMSTestSupport {
 
         final String requestUrl = "wms/kml?layers=" + layerName
                 + "&styles=&mode=superoverlay&format_options=kmltitle:myCustomLayerTitle";
-        System.out.println(getAsServletResponse(requestUrl).getContentType());
+        // System.out.println(getAsServletResponse(requestUrl).getContentType());
         Document dom = getAsDOM(requestUrl);
-        // print(dom);
+        print(dom);
         assertEquals("kml", dom.getDocumentElement().getLocalName());
         assertXpathEvaluatesTo("myCustomLayerTitle", "/kml:kml/kml:Document/kml:name",
                 dom);

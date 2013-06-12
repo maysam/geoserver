@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import org.geoserver.kml.builder.StreamingKMLBuilder;
 import org.geoserver.platform.ServiceException;
 import org.geoserver.wms.GetMapOutputFormat;
 import org.geoserver.wms.MapProducerCapabilities;
@@ -43,12 +44,12 @@ public class KMLMapOutputFormat implements GetMapOutputFormat {
     public static final String NL_KML_MIME_TYPE = KMLMapOutputFormat.MIME_TYPE + ";mode=networklink";
 
     private Set<String> OUTPUT_FORMATS = Collections.unmodifiableSet(new HashSet<String>(Arrays
-            .asList(MIME_TYPE, NL_KML_MIME_TYPE, "application/vnd.google-earth.kml", "kml",
+            .asList(MIME_TYPE, /* NL_KML_MIME_TYPE, */ "application/vnd.google-earth.kml", "kml",
                     "application/vnd.google-earth.kml xml")));
 
     private WMS wms;
     
-    KMLBuilder builder = new KMLBuilder();
+    StreamingKMLBuilder builder = new StreamingKMLBuilder();
 
     public KMLMapOutputFormat(WMS wms) {
         this.wms = wms;
