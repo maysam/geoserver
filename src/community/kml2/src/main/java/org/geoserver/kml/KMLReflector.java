@@ -145,12 +145,13 @@ public class KMLReflector {
         }
 
         // first set up some of the normal wms defaults
+        boolean refreshMode = mode.equals("refresh");
         if (request.getWidth() < 1) {
-            request.setWidth(mode.equals("refresh") || containsRasterData ? DEFAULT_OVERLAY_SIZE : 256);
+            request.setWidth(refreshMode || containsRasterData ? DEFAULT_OVERLAY_SIZE : 256);
         }
 
         if (request.getHeight() < 1) {
-            request.setHeight(mode.equals("refresh") || containsRasterData ? DEFAULT_OVERLAY_SIZE : 256);
+            request.setHeight(refreshMode || containsRasterData ? DEFAULT_OVERLAY_SIZE : 256);
         }
 
         // Force srs to lat/lon for KML output.
@@ -180,29 +181,16 @@ public class KMLReflector {
         // TODO: create a subclass of GetMapRequest to store these values
 
         Boolean superoverlay = (Boolean) fo.get("superoverlay");
-        if (superoverlay == null)
+        if (superoverlay == null) {
             superoverlay = Boolean.FALSE;
-        String formatExtension = ".kmz";
-        if (superoverlay) {
-            request.setFormat(KMZMapOutputFormat.MIME_TYPE);
-        } else if (mode.equals("refresh") || containsRasterData) {
-            request.setFormat(KMLMapOutputFormat.MIME_TYPE);
+        }
+        if (superoverlay || refreshMode || containsRasterData) {
+            request.setFormat(NetworkLinkMapOutputFormat.KML_MIME_TYPE);
         } else if (!Arrays.asList(KMZMapOutputFormat.OUTPUT_FORMATS).contains(request.getFormat())) {
-            // if the user did not explicitly request kml give them back KMZ
             request.setFormat(KMLMapOutputFormat.MIME_TYPE);
-            formatExtension = ".kml";
         }
 
-        // response.setContentType(request.getFormat());
-
-        org.geoserver.wms.WebMap wmsResponse;
-        if (!"download".equals(mode)) {
-            // the old code used to setup kmz nl, but in fact it ended up generating non compressed
-            // ones
-            request.setFormat(KMLMapOutputFormat.NL_KML_MIME_TYPE);
-        }
-
-        wmsResponse = wms.getMap(request);
+        org.geoserver.wms.WebMap wmsResponse = wms.getMap(request);
 
         return wmsResponse;
     }
@@ -226,13 +214,13 @@ public class KMLReflector {
      */
     public static void organizeFormatOptionsParams(Map<String, String> kvp,
             Map<String, Object> formatOptions) throws Exception {
-
         WMSRequests.mergeEntry(kvp, formatOptions, "legend");
         WMSRequests.mergeEntry(kvp, formatOptions, "kmscore");
         WMSRequests.mergeEntry(kvp, formatOptions, "kmattr");
         WMSRequests.mergeEntry(kvp, formatOptions, "kmltitle");
         WMSRequests.mergeEntry(kvp, formatOptions, "extendeddata");
         WMSRequests.mergeEntry(kvp, formatOptions, "extrude");
+        WMSRequests.mergeEntry(kvp, formatOptions, "kmplacemark");
     }
 
 }
