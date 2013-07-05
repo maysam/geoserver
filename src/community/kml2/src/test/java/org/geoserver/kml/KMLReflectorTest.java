@@ -584,6 +584,25 @@ public class KMLReflectorTest extends WMSTestSupport {
     }
     
     @Test
+    public void testLookatOptions() throws Exception {
+        String layerId = getLayerId(MockData.BASIC_POLYGONS);
+        final String requestUrl = "wms/kml?layers=" + layerId
+                + "&styles=polygon&mode=download" +
+                "&format_options=lookatbbox:-20,-20,20,20;altitude:10;heading:0;tilt:30;range:100;altitudemode:absolute";
+        Document doc = getAsDOM(requestUrl);
+        // print(doc);
+
+        // overlay location
+        XMLAssert.assertXpathEvaluatesTo("0.0", "//kml:Document/kml:LookAt/kml:longitude", doc);
+        XMLAssert.assertXpathEvaluatesTo("0.0", "//kml:Document/kml:LookAt/kml:latitude", doc);
+        XMLAssert.assertXpathEvaluatesTo("10.0", "//kml:Document/kml:LookAt/kml:altitude", doc);
+        XMLAssert.assertXpathEvaluatesTo("0.0", "//kml:Document/kml:LookAt/kml:heading", doc);
+        XMLAssert.assertXpathEvaluatesTo("30.0", "//kml:Document/kml:LookAt/kml:tilt", doc);
+        XMLAssert.assertXpathEvaluatesTo("100.0", "//kml:Document/kml:LookAt/kml:range", doc);
+        XMLAssert.assertXpathEvaluatesTo("absolute", "//kml:Document/kml:LookAt/kml:altitudeMode", doc);
+    }
+    
+    @Test
     public void testExtendedData() throws Exception {
         String layerId = getLayerId(MockData.AGGREGATEGEOFEATURE);
         final String requestUrl = "wms/kml?layers=" + layerId
