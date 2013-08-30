@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,6 +26,7 @@ import org.geoserver.catalog.Catalog;
 import org.geoserver.catalog.FeatureTypeInfo;
 import org.geoserver.platform.GeoServerExtensions;
 import org.geoserver.platform.ServiceException;
+import org.geoserver.security.impl.GeoServerUser;
 import org.geoserver.wfs.request.TransactionElement;
 import org.geoserver.wfs.request.TransactionRequest;
 import org.geoserver.wfs.request.TransactionResponse;
@@ -537,7 +539,17 @@ public class Transaction {
         if(authentication != null) {
             Object principal = authentication.getPrincipal();
             if(principal instanceof UserDetails) {
-                username = ((UserDetails) principal).getUsername(); 
+                username = ((UserDetails) principal).getUsername();
+                if(principal instanceof GeoServerUser){
+                    //pass along any user property
+                    GeoServerUser gsUser = (GeoServerUser) principal;
+                    Properties properties = gsUser.getProperties();
+                    if (!properties.isEmpty()) {
+                        for (Object pname : properties.keySet()) {
+                            transaction.putProperty(pname, properties.get(pname));
+                        }
+                    }
+                }
             }
         }
         
