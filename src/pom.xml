@@ -1467,6 +1467,11 @@
    <url>dav:http://repo.opengeo.org</url>
    <uniqueVersion>false</uniqueVersion>
   </snapshotRepository>
+	 <snapshotRepository>
+          <id>boundless</id>
+          <name>Boundless Maven Repository</name>
+          <url>http://repo.boundlessgeo.com/main</url>
+        </snapshotRepository>
  </distributionManagement>
 
  <modules>
