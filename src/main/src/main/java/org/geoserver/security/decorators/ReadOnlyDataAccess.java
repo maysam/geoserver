@@ -70,4 +70,9 @@ public class ReadOnlyDataAccess<T extends FeatureType, F extends Feature> extend
             return new UnsupportedOperationException("This data access is read only, service code is supposed to perform writes via FeatureStore instead");
     }
 
+    @Override
+    public void removeSchema(Name name) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

@@ -109,4 +109,14 @@ public class ReadOnlyDataStore extends DecoratingDataStore {
             return new UnsupportedOperationException("This datastore is read only, service code is supposed to perform writes via FeatureStore instead");
     }
 
+    @Override
+    public void removeSchema(String string) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void removeSchema(Name name) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

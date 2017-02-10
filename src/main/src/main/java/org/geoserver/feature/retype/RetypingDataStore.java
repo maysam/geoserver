@@ -329,4 +329,14 @@ public class RetypingDataStore implements DataStore {
     public void updateSchema(Name typeName, SimpleFeatureType featureType) throws IOException {
         updateSchema(typeName.getLocalPart(), featureType);
     }    
+
+    @Override
+    public void removeSchema(String string) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void removeSchema(Name name) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 }

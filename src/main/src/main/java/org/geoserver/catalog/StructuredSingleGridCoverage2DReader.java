@@ -72,4 +72,14 @@ public class StructuredSingleGridCoverage2DReader extends SingleGridCoverage2DRe
         return structuredDelegate.getDimensionDescriptors(coverageName);
     }
 
+    @Override
+    public boolean removeCoverage(String string, boolean bln) throws IOException, UnsupportedOperationException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void delete(boolean bln) throws IOException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }
