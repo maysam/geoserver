@@ -15,7 +15,6 @@
  <packaging>pom</packaging>
  <version>2.5-SNAPSHOT</version>
  <name>GeoServer</name>
-
  <scm>
   <connection>scm:git:git://github.com/geoserver/geoserver.git</connection>
   <developerConnection>scm:git:[fetch=]git://github.com/geoserver/geoserver.git[push=]git@github.com:geoserver/geoserver.git</developerConnection>
@@ -1515,6 +1514,8 @@
   <javac.maxHeapSize>256m</javac.maxHeapSize>
   <image.tests>true</image.tests>
   <interactive.tests>false</interactive.tests>
+  <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  <rpm.context.file.target>/etc/yum.repos.d/</rpm.context.file.target>
  </properties>
 
  <profiles>
@@ -1575,8 +1576,70 @@
         <artifactId>gwc-core</artifactId>
       </dependency>
     </dependencies>
+   
     <build>
     <plugins>
+          
+        <!-- 
+        The RPM plugin is used to create distributable apps from our war file. 
+        To use it fire:
+        $ mvn install rpm:rpm
+        ...
+        The resulting rpm is then found at Project/target/rpm/Project/RPMS/noarch/Project-versoin-1.noarch.rpm
+        For example: ImageServer/target/rpm/ImageServer/RPMS/noarch/ImageServer-6.5.0-1.noarch.rpm
+        -->
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>rpm-maven-plugin</artifactId>
+          <version>2.1-alpha-1</version>
+          <configuration>
+            <group>vtadrones</group>
+            <mappings>
+              <mapping>
+                <directory>${basedir}/src/web/target</directory>
+                <configuration>true</configuration>
+                <filemode>755</filemode>
+                <username>vtadrones</username>
+                <groupname>vtadrones</groupname>
+                <sources>
+                  <source>
+                    <location>${basedir}/src/target/</location>
+                  </source>
+                </sources>
+              </mapping>
+              <mapping>
+                <directory>/usr/share/tomcat6/webapps</directory>
+                <filemode>755</filemode>
+                <username>${rpm.file.owner}</username>
+                <groupname>${rpm.file.owner}</groupname>
+                <!-- 
+                The following adtifact/classifiers/classifier voodoo is required to get the 
+                projects main artifact into the rpm (and only the main artifact, without the 
+                test artifact.
+                See http://mojo.codehaus.org/rpm-maven-plugin/map-params.html#artifact
+                -->
+                <artifact>
+                  <classifiers>
+                    <classifier/>
+                  </classifiers>
+                </artifact>
+              </mapping>
+            </mappings>
+            <preinstallScriptlet>
+              <script>service tomcat6 stop</script>
+            </preinstallScriptlet>
+            <postinstallScriptlet>
+              <script>
+                echo "removing ${apps.deploy.directory}"
+                rm -rf ${apps.deploy.directory} 
+                echo "removing ${tomcat.work.directory}/*"
+                rm -rf ${tomcat.work.directory}/*
+                service tomcat6 start
+              </script>
+            </postinstallScriptlet>
+          </configuration>
+        </plugin>
+      
 
       <!-- grab a geotools dependnecy to figure out its version -->
       <plugin>
